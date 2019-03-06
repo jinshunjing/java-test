@@ -1,6 +1,7 @@
 package org.jim.lock;
 
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LockWorker {
 
@@ -12,6 +13,7 @@ public class LockWorker {
     public LockWorker() {
         lock1 = new ReentrantLock();
         lock2 = new ReentrantLock();
+        new ReentrantReadWriteLock();
     }
 
     public void write(int nv) {
