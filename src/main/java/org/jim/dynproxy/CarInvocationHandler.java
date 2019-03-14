@@ -3,6 +3,12 @@ package org.jim.dynproxy;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+/**
+ * Java Proxy
+ * - 角色：接口，真实对象，代理对象
+ * - 创建代理对象：Proxy#newProxyInstance(ClassLoader, Class<?>[], InvocationHandler)
+ * - 代理对象执行 InvocationHandler#invoke(Object, Method, Object[])
+ */
 public class CarInvocationHandler implements InvocationHandler {
 
     private Car car;
@@ -23,6 +29,13 @@ public class CarInvocationHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         System.err.println("before");
+
+        // 创建代理对象
+//        Proxy.newProxyInstance(
+//                ClassLoader,
+//                Class<?>[], // interface
+//                InvocationHandler
+//        );
 
         // 执行目标对象的方法
         method.invoke(car, args);
