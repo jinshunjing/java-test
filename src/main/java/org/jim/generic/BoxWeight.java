@@ -1,6 +1,7 @@
 package org.jim.generic;
 
 /**
+ * 范型方法
  *
  * @author Dev
  */

@@ -1,6 +1,7 @@
 package org.jim.generic;
 
 /**
+ * 范型类
  *
  * @author Dev
  * @param <T>
