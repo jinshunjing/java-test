@@ -16,6 +16,7 @@ public class BinaryTree<E> {
      */
     private static class Node<E> {
         E value;
+
         int num;
         int level;
 
@@ -27,6 +28,10 @@ public class BinaryTree<E> {
             this.left = left;
             this.right = right;
         }
+
+        Node(E value) {
+            this.value = value;
+        }
     }
 
 
@@ -35,7 +40,11 @@ public class BinaryTree<E> {
     private Node<E> root;
 
     public BinaryTree(E value, Comparator<E> comparator) {
-        root = new Node(value, null, null);
+        root = new Node(value);
+        this.comparator = comparator;
+    }
+
+    public BinaryTree(Comparator<E> comparator) {
         this.comparator = comparator;
     }
 
@@ -57,12 +66,58 @@ public class BinaryTree<E> {
         }
 
         if (p == null) {
-            root = new Node(value, null, null);
+            root = new Node(value);
         } else {
             if (comparator.compare(value, p.value) < 0) {
-                p.left = new Node(value, null, null);
+                p.left = new Node(value);
             } else {
-                p.right = new Node(value, null, null);
+                p.right = new Node(value);
+            }
+        }
+    }
+
+    /**
+     * BFS
+     */
+    public void bfs() {
+        Queue<Node<E>> queue = new LinkedList<>();
+
+        int c = 0;
+        root.level = c;
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            Node<E> p = queue.poll();
+
+            if (p.level != c) {
+                c++;
+                System.out.println();
+            }
+            System.out.print(p.value + ", ");
+
+            if (p.left != null) {
+                p.left.level = p.level + 1;
+                queue.offer(p.left);
+            }
+            if (p.right != null) {
+                p.right.level = p.level + 1;
+                queue.offer(p.right);
+            }
+        }
+        System.out.println();
+    }
+
+    public void level() {
+        Queue<Node<E>> queue = new LinkedList<>();
+
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            Node<E> n = queue.poll();
+            if (n != null) {
+                System.out.println(n.value);
+
+                queue.offer(n.left);
+                queue.offer(n.right);
             }
         }
     }
@@ -208,50 +263,32 @@ public class BinaryTree<E> {
     }
 
     /**
-     * BFS
-     */
-    public void level() {
-        Queue<Node<E>> queue = new LinkedList<>();
-
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            Node<E> n = queue.poll();
-            if (n != null) {
-                System.out.println(n.value);
-
-                queue.offer(n.left);
-                queue.offer(n.right);
-            }
-        }
-    }
-
-    /**
      * 打印
      */
     public void print() {
-        //
+        // 计数层高
         root.level = 1;
-        int level = calc2(root);
+        int level = calcHeight(root);
 
-        //
-        format2(level);
+        // 打印树
+        format2Decimal(level);
     }
 
     /**
      * 计算高度
      */
-    private int calc2(Node<E> n) {
+    private int calcHeight(Node<E> n) {
         int ch = n.level;
         int lh = ch, rh = ch;
 
         ch++;
         if (n.left != null) {
             n.left.level = ch;
-            lh = calc2(n.left);
+            lh = calcHeight(n.left);
         }
         if (n.right != null) {
             n.right.level = ch;
-            rh = calc2(n.right);
+            rh = calcHeight(n.right);
         }
 
         return Math.max(lh, rh);
@@ -260,7 +297,7 @@ public class BinaryTree<E> {
     /**
      * 分层打印
      */
-    private void format2(int level) {
+    private void format2Decimal(int level) {
         Queue<Node<E>> queue = new LinkedList<>();
 
         int d = 0;
@@ -268,56 +305,88 @@ public class BinaryTree<E> {
         queue.offer(root);
         while (!queue.isEmpty()) {
             Node<E> n = queue.poll();
-            if (n != null) {
-                // 计算间隔
-                int num = (1 << (level - n.level + 1)) - 1;
+            if (n == null) {
+                continue;
+            }
 
-                // 第一个减半
-                if (d < n.level) {
-                    num = num >>> 1;
+            // 计算间隔
+            int num = (1 << (level - n.level + 1)) - 1;
 
-                    // 换行
-                    if (d > 0) {
-                        System.out.println();
-                    }
-                    d = n.level;
+            // 第一个减半
+            if (d < n.level) {
+                num = num >>> 1;
+
+                // 换行
+                if (d > 0) {
+                    System.out.println();
                 }
+                d = n.level;
+            }
 
-                for (int k = 0; k < num; k++) {
-                    System.out.print("-");
+            // 打印间隔
+            for (int k = 0; k < num; k++) {
+                System.out.print("--");
+            }
+
+            // 打印数值
+            if (n.value == null) {
+                System.out.print("**");
+            } else {
+                String str = n.value.toString();
+                if (str.length() == 1) {
+                    System.out.print("0");
                 }
+                System.out.print(str);
+            }
 
-                if (n.value == null) {
-                    System.out.print("*");
+            // 不是叶子节点，补上不存在的儿子
+            if (n.left != null || n.right != null) {
+                Node<E> pad = new Node<>(null);
+                pad.level = n.level + 1;
+
+                if (n.left == null) {
+                    queue.offer(pad);
                 } else {
-                    System.out.print(n.value);
+                    queue.offer(n.left);
                 }
 
-                if (n.level < level) {
-                    // 补上不存在的节点
-                    Node<E> pad = new Node<>(null, null, null);
-                    pad.level = n.level + 1;
-
-                    if (n.left == null) {
-                        queue.offer(pad);
-                    } else {
-                        queue.offer(n.left);
-                    }
-                    if (n.right == null) {
-                        queue.offer(pad);
-                    } else {
-                        queue.offer(n.right);
-                    }
+                if (n.right == null) {
+                    queue.offer(pad);
                 } else {
-                    if (n.left != null) {
-                        queue.offer(n.left);
-                    }
-                    if (n.right != null) {
-                        queue.offer(n.right);
-                    }
+                    queue.offer(n.right);
+                }
+            }
+            // 叶子节点不需要补
+            else {
+                if (n.left != null) {
+                    queue.offer(n.left);
+                }
+                if (n.right != null) {
+                    queue.offer(n.right);
                 }
             }
         }
         System.out.println();
     }
+
+    /**
+     * 翻转树
+     */
+    public void invert() {
+        invert(root);
+    }
+    public void invert(Node<E> p) {
+        if (p == null) {
+            return;
+        }
+
+        invert(p.left);
+        invert(p.right);
+
+        // swap
+        Node<E> t = p.left;
+        p.left = p.right;
+        p.right = t;
+    }
+
 }

@@ -8,6 +8,26 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class KMPTest {
 
     @Test
+    public void testMatch1() {
+        char[] s = new char[]{1, 2, 1, 2, 3, 6};
+        char[] p = new char[]{1, 2};
+        System.out.println(KMP.match(s, p));
+
+        p = new char[]{1,2,3};
+        System.out.println(KMP.match(s, p));
+
+        p = new char[]{1,2,4};
+        System.out.println(KMP.match(s, p));
+
+        p = new char[]{3};
+        System.out.println(KMP.match(s, p));
+
+        s = new char[]{1,2};
+        p = new char[]{1,2};
+        System.out.println(KMP.match(s, p));
+    }
+
+    @Test
     public void testNext() {
         char[] pattern = {'a', 'a', 'a'};
         pattern = new char[]{'a', 'b', 'a', 'b', 'c'};

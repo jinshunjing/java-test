@@ -1,5 +1,10 @@
 package org.jim.tree;
 
+import java.util.Stack;
+
+/**
+ * 红黑树
+ */
 public class RBTree {
 
     private static class Node {
@@ -11,6 +16,61 @@ public class RBTree {
             value = v;
             color = c;
             parent = p;
+        }
+    }
+
+    public void prev() {
+        Stack<Node> stack = new Stack<>();
+
+        Node n = root;
+        while (n != null || !stack.isEmpty()) {
+            while (n != null) {
+                System.out.print(n.value);
+
+                stack.push(n);
+                n = n.left;
+            }
+
+            n = stack.pop();
+            n = n.right;
+        }
+    }
+
+    public void mid() {
+        Stack<Node> stack = new Stack<>();
+
+        Node n = root;
+        while (n != null || !stack.isEmpty()) {
+            while (n != null) {
+                stack.push(n);
+                n = n.left;
+            }
+
+            n = stack.pop();
+            System.out.print(n.value);
+            n = n.right;
+        }
+    }
+
+    public void post() {
+        Stack<Node> stack = new Stack<>();
+        Stack<Integer> stack2 = new Stack<>();
+
+        Node n = root;
+        while (n != null || !stack.isEmpty()) {
+            while (n != null) {
+                stack2.push(n.value);
+
+                stack.push(n);
+                n = n.right;
+            }
+
+            n = stack.pop();
+            n = n.left;
+        }
+
+        while (!stack2.isEmpty()) {
+            System.out.print(stack2.pop());
         }
     }
 
@@ -53,37 +113,39 @@ public class RBTree {
     private static final boolean RED = false;
 
     private void fixAfterInsertion(Node x) {
+        // 新节点染成红色
         x.color = RED;
 
-        // 当前节点不是root，并且父节点为红色
+        // 新节点不是root，并且父节点为红色
         while (x != null && x != root && x.parent.color == RED) {
             // 父亲是祖父的左儿子
             if (parentOf(x) == leftOf(parentOf(parentOf(x)))) {
-                // 叔叔节点
+                // 叔叔
                 Node y = rightOf(parentOf(parentOf(x)));
-                // 叔叔节点也是红色
+                // 叔叔和父亲都是红色
                 if (colorOf(y) == RED) {
                     // 叔叔，父亲变黑色，祖父变红色
                     setColor(parentOf(x), BLACK);
                     setColor(y, BLACK);
                     setColor(parentOf(parentOf(x)), RED);
-
                     // 继续处理祖父
                     x = parentOf(parentOf(x));
                 }
-                // 叔叔节点是黑色
+                // 叔叔是黑色，父亲是红色
                 else {
-                    // 不是一条线，转成一条线，跟父亲节点交换
+                    // 新节点与父亲不在一条线上
+                    // 新节点跟父亲交换，变成一条线
                     if (x == rightOf(parentOf(x))) {
+                        // 父亲变成了新节点
                         x = parentOf(x);
-                        // 父亲节点左转
+                        // 父亲左转，新节点跟父亲交换
                         rotateLeft(x);
                     }
-                    // 是一条线
+                    // 新节点与父亲在一条线上
                     // 父亲变黑色，祖父变红色
                     setColor(parentOf(x), BLACK);
                     setColor(parentOf(parentOf(x)), RED);
-                    // 祖父节点右转，父亲与祖父交换
+                    // 祖父右转，父亲与祖父交换
                     rotateRight(parentOf(parentOf(x)));
                 }
             } else {
@@ -105,9 +167,15 @@ public class RBTree {
             }
         }
 
+        // 确保root节点是黑色
         root.color = BLACK;
     }
 
+    /**
+     * 向左旋转：父亲--右儿子 变成 父亲--左儿子
+     *
+     * @param p
+     */
     private void rotateLeft(Node p) {
         if (p != null) {
             // 交换当前节点与右儿子
@@ -121,7 +189,6 @@ public class RBTree {
 
             // r 取代 p
             r.parent = p.parent;
-            // 如果p是root
             if (p.parent == null) {
                 root = r;
             }
@@ -138,6 +205,11 @@ public class RBTree {
         }
     }
 
+    /**
+     * 向右旋转：父亲--左儿子 变成 父亲--右儿子
+     *
+     * @param p
+     */
     private void rotateRight(Node p) {
         if (p != null) {
             // 交换当前节点与左儿子
@@ -170,21 +242,17 @@ public class RBTree {
     private boolean colorOf(Node node) {
         return node == null ? BLACK : node.color;
     }
-
     private void setColor(Node node, boolean color) {
         if (node == null) {
             node.color = color;
         }
     }
-
     private Node parentOf(Node node) {
         return node == null ? null : node.parent;
     }
-
     private Node leftOf(Node node) {
         return node == null ? null : node.left;
     }
-
     private Node rightOf(Node node) {
         return node == null ? null : node.right;
     }

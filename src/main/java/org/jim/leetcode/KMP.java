@@ -7,6 +7,46 @@ package org.jim.leetcode;
  */
 public class KMP {
 
+    public static void getNext1(char[] p, int[] next) {
+        int n = p.length;
+
+        int i = 0, j = -1;
+        next[i] = j;
+
+        // i+1
+        while (i < n - 1) {
+            if (j == -1 || p[i] == p[j]) {
+                i++;
+                j++;
+                next[i] = j;
+            } else {
+                j = next[j];
+            }
+        }
+    }
+
+    public static int match(char[] s, char[] p) {
+        int n = p.length, m = s.length;
+        int[] next = new int[n];
+        getNext1(p, next);
+
+        int i = 0, j = 0;
+        while (i < m && j < n) {
+            if (j == -1 || s[i] == p[j]) {
+                i++;
+                j++;
+            } else {
+                j = next[j];
+            }
+        }
+
+        if (j == n) {
+            return i - n;
+        } else {
+            return -1;
+        }
+    }
+
     public static void getNext(char[] pattern, int[] next) {
         int i = 0, j = -1;
         int m = pattern.length;
